@@ -1,0 +1,6 @@
+<view class="date-picker">
+  <text>{{label}}</text>
+  <picker mode="date" bindchange="change">
+    <view>{{value || '不设置'}}</view>
+  </picker>
+</view>

@@ -1,0 +1,57 @@
+<view class="page safe-bottom">
+  <input class="title-input" value="{{title}}" data-field="title" placeholder="标题" bindinput="onInput" />
+  <textarea class="detail-input" value="{{detail}}" data-field="detail" placeholder="详情，可写一点背景" bindinput="onInput"></textarea>
+
+  <view class="section">
+    <view class="section-title">图片</view>
+    <view class="image-row">
+      <view wx:for="{{imageFileIds}}" wx:key="*this" class="image-thumb" data-url="{{item}}" bindtap="previewImage">
+        <text>云图</text>
+        <text class="remove" data-index="{{index}}" catchtap="removeCloudImage">×</text>
+      </view>
+      <view wx:for="{{localImages}}" wx:key="src" class="image-thumb {{item.status === 'failed' ? 'failed' : ''}}" data-url="{{item.src}}" bindtap="previewImage">
+        <text>{{item.status === 'failed' ? '失败' : '本地'}}</text>
+        <text class="remove" data-index="{{index}}" catchtap="removeLocalImage">×</text>
+      </view>
+      <view wx:if="{{imageFileIds.length + localImages.length < 3}}" class="image-add" bindtap="chooseImages">+</view>
+    </view>
+    <view wx:if="{{localImages.length}}" class="hint" bindtap="retryUpload">图片上传失败时可点此重试</view>
+  </view>
+
+  <view class="field-row">
+    <text>截止日期</text>
+    <picker mode="date" data-field="dueDate" bindchange="onInput">
+      <view class="picker-value">{{dueDate || '不设置'}}</view>
+    </picker>
+  </view>
+
+  <view class="field-row">
+    <text>提醒时间</text>
+    <picker mode="date" data-field="reminderDate" bindchange="onInput">
+      <view class="picker-value">{{reminderDate || '日期'}}</view>
+    </picker>
+    <picker mode="time" data-field="reminderTime" bindchange="onInput">
+      <view class="picker-value">{{reminderTime || '时间'}}</view>
+    </picker>
+  </view>
+
+  <input class="tag-input" value="{{tagsText}}" data-field="tagsText" placeholder="标签，空格分隔，最多 3 个" bindinput="onInput" />
+  <view wx:if="{{tags.length}}" class="section">
+    <view class="section-title">标签颜色</view>
+    <view wx:for="{{tags}}" wx:key="name" wx:for-item="tag" wx:for-index="tagIndex" class="tag-color-row">
+      <view class="tag-preview"><text class="tag-dot" style="background: {{tag.color}}"></text>{{tag.name}}</view>
+      <view class="color-list">
+        <view wx:for="{{tagColors}}" wx:key="color" wx:for-item="option" class="color-dot {{tag.color === option.color ? 'selected' : ''}}" style="background: {{option.color}}" data-tag-index="{{tagIndex}}" data-color="{{option.color}}" bindtap="setTagColor"></view>
+      </view>
+    </view>
+  </view>
+
+  <view class="status">
+    <view>同步状态：{{syncStatus}}</view>
+    <view bindtap="retryReminder">提醒状态：{{reminderStatus === 'local_only' ? '仅本地提醒' : reminderStatus}}</view>
+  </view>
+
+  <button class="primary" bindtap="saveTask">保存</button>
+  <button class="secondary" bindtap="toggleComplete">{{task.completedAt ? '取消完成' : '标记完成'}}</button>
+  <button class="danger" bindtap="confirmDelete">删除</button>
+</view>

@@ -1,0 +1,146 @@
+.page {
+  min-height: 100vh;
+  padding: 28rpx;
+  box-sizing: border-box;
+}
+
+.profile,
+.stats,
+.section {
+  background: #ffffff;
+  border: 1rpx solid #e5e7eb;
+  border-radius: 8rpx;
+  margin-bottom: 18rpx;
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx;
+}
+
+.avatar-button {
+  padding: 0;
+  background: transparent;
+}
+
+.avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+}
+
+.placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e7f1fb;
+  color: #4A90D9;
+  font-weight: 700;
+}
+
+.nickname {
+  flex: 1;
+  font-size: 34rpx;
+  font-weight: 650;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  padding: 24rpx 0;
+}
+
+.stats view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.stats text:first-child {
+  font-size: 38rpx;
+  font-weight: 700;
+}
+
+.stats text:last-child {
+  color: #6b7280;
+  font-size: 24rpx;
+}
+
+.section {
+  padding: 22rpx;
+}
+
+.section-title {
+  font-weight: 650;
+  margin-bottom: 14rpx;
+}
+
+.tag-editor,
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12rpx;
+}
+
+.tag-editor input {
+  flex: 1;
+  padding: 16rpx;
+  background: #f3f4f6;
+  border-radius: 8rpx;
+}
+
+.color-list,
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-top: 16rpx;
+}
+
+.color-dot,
+.tag-dot {
+  display: inline-block;
+  border-radius: 50%;
+}
+
+.color-dot {
+  width: 38rpx;
+  height: 38rpx;
+  border: 3rpx solid transparent;
+}
+
+.color-dot.selected {
+  border-color: #202124;
+}
+
+.tag {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 8rpx 12rpx;
+  background: #f3f4f6;
+  border-radius: 8rpx;
+}
+
+.tag-dot {
+  width: 14rpx;
+  height: 14rpx;
+}
+
+.delete {
+  color: #E03131;
+  margin-left: 8rpx;
+}
+
+.list view {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f1f3f5;
+}
+
+.list view:last-child {
+  border-bottom: 0;
+}

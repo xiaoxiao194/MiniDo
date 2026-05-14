@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/edit/edit",
+    "pages/weekly/weekly",
+    "pages/mine/mine",
+    "pages/privacy/privacy"
+  ],
+  "window": {
+    "navigationBarTitleText": "MiniDo",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f7f8fa",
+    "enablePullDownRefresh": true
+  },
+  "style": "v2",
+  "privacyLocation": "pages/privacy/privacy",
+  "sitemapLocation": "sitemap.json"
+}

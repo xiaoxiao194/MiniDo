@@ -1,0 +1,30 @@
+<view class="page safe-bottom">
+  <view class="title">MiniDo 隐私保护指引</view>
+
+  <view class="section">
+    <view class="section-title">收集的信息</view>
+    <text>MiniDo 会收集你的 openid、任务数据、任务图片，以及提醒相关状态。这些信息仅用于个人待办记录。</text>
+  </view>
+
+  <view class="section">
+    <view class="section-title">信息用途</view>
+    <text>openid 用于识别你的微信小程序身份；任务数据和图片用于数据同步；提醒时间用于任务提醒。</text>
+  </view>
+
+  <view class="section">
+    <view class="section-title">信息存储</view>
+    <text>任务数据和图片存储在微信云开发 CloudBase 中，同时保留本地缓存以支持本地优先使用。</text>
+  </view>
+
+  <view class="section">
+    <view class="section-title">用户权利</view>
+    <text>你可以随时删除任务。删除后任务会从列表消失，并在同步后更新云端状态。</text>
+  </view>
+
+  <view class="section">
+    <view class="section-title">联系方式</view>
+    <text>如需处理隐私相关问题，请通过 MiniDo 小程序运营者预留联系方式联系。</text>
+  </view>
+
+  <button class="primary" bindtap="acceptPrivacy">同意并继续</button>
+</view>

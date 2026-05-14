@@ -1,0 +1,38 @@
+<view class="page safe-bottom">
+  <view class="summary">
+    <view>
+      <view class="number">{{completedCount}}</view>
+      <view class="label">本周完成</view>
+    </view>
+    <view>
+      <view class="number">{{unfinishedCount}}</view>
+      <view class="label">待跟进</view>
+    </view>
+    <view>
+      <view class="number">{{completionRate}}%</view>
+      <view class="label">完成率</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">已完成</view>
+    <view wx:if="{{!groups.length}}" class="empty">本周还没有完成记录</view>
+    <view wx:for="{{groups}}" wx:key="tag" class="group">
+      <view class="tag-title">【{{item.tag}}】</view>
+      <view wx:for="{{item.tasks}}" wx:for-item="task" wx:key="id" class="task-line">- {{task.title}}</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">待跟进</view>
+    <view wx:if="{{!followUps.length}}" class="empty">暂无待跟进</view>
+    <view wx:for="{{followUps}}" wx:key="id" class="task-line">- {{item.title}}</view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">周报文本</view>
+    <textarea class="report-text" value="{{reportText}}" disabled></textarea>
+  </view>
+
+  <button class="primary" bindtap="copyReport">复制周报</button>
+</view>

@@ -1,0 +1,50 @@
+<view class="page safe-bottom">
+  <view class="profile">
+    <button class="avatar-button" open-type="chooseAvatar" bindchooseavatar="chooseAvatar">
+      <image wx:if="{{avatarUrl}}" class="avatar" src="{{avatarUrl}}"></image>
+      <view wx:else class="avatar placeholder">M</view>
+    </button>
+    <input class="nickname" value="{{nickName}}" type="nickname" bindinput="onNickNameInput" />
+  </view>
+
+  <view class="stats">
+    <view><text>{{total}}</text><text>总任务</text></view>
+    <view><text>{{completed}}</text><text>已完成</text></view>
+    <view><text>{{completionRate}}%</text><text>完成率</text></view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">数据导出</view>
+    <button bindtap="copyJson">导出数据 JSON</button>
+    <button bindtap="copyAllUnfinished">复制全部任务</button>
+    <button bindtap="copyToday">复制今日任务</button>
+  </view>
+
+  <view class="section">
+    <view class="section-title">标签管理</view>
+    <view class="tag-editor">
+      <input value="{{newTagName}}" placeholder="新增标签" bindinput="onNewTagInput" />
+      <button bindtap="addTag">添加</button>
+    </view>
+    <view class="color-list">
+      <view wx:for="{{tagColors}}" wx:key="color" class="color-dot {{newTagColor === item.color ? 'selected' : ''}}" style="background: {{item.color}}" data-color="{{item.color}}" bindtap="setNewTagColor"></view>
+    </view>
+    <view class="tags">
+      <view wx:for="{{tags}}" wx:key="name" class="tag">
+        <text class="tag-dot" style="background: {{item.color}}"></text>{{item.name}}
+        <text class="delete" data-name="{{item.name}}" bindtap="deleteTag">删除</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section row">
+    <text>提醒设置</text>
+    <switch checked="{{remindersEnabled}}" bindchange="toggleReminders" color="#4A90D9"></switch>
+  </view>
+
+  <view class="section list">
+    <view bindtap="openWeekly">周报查看</view>
+    <view bindtap="openPrivacy">隐私协议</view>
+    <view bindtap="showAbout">关于 MiniDo</view>
+  </view>
+</view>

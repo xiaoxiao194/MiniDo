@@ -1,0 +1,11 @@
+<view class="task-item" bindlongpress="open">
+  <view class="check {{task.completedAt ? 'done' : ''}}" bindtap="toggle"></view>
+  <view class="body" bindtap="open">
+    <view class="title {{task.completedAt ? 'done-title' : ''}}">{{task.title}}</view>
+    <view wx:if="{{task.timeText}}" class="meta">{{task.timeText}}</view>
+  </view>
+  <view class="actions">
+    <view data-action="tomorrow" bindtap="action">明天</view>
+    <view data-action="pin" bindtap="action">置顶</view>
+  </view>
+</view>

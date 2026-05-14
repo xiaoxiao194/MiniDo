@@ -1,0 +1,117 @@
+<template name="taskCard">
+  <view class="task-card {{task.completedAt ? 'completed-card' : ''}}" data-id="{{task.id}}" bindlongpress="showTaskActions">
+    <view class="check {{task.completedAt ? 'done' : ''}}" data-id="{{task.id}}" catchtap="toggleComplete"></view>
+    <view class="task-main" data-id="{{task.id}}" bindtap="openTask">
+      <view class="task-title {{task.completedAt ? 'done' : ''}}">
+        <text wx:if="{{task.isPinned}}" class="pin">置顶</text>{{task.title}}
+      </view>
+      <view wx:if="{{task.timeText}}" class="meta {{task.isOverdue ? 'overdue-text' : ''}} {{task.isDueToday ? 'today-text' : ''}}">{{task.timeText}}</view>
+      <view wx:if="{{task.detailExcerpt}}" class="excerpt">{{task.detailExcerpt}}</view>
+      <view wx:if="{{task.hasImages}}" class="meta">有图片</view>
+      <view wx:if="{{task.tags.length}}" class="task-tags">
+        <view wx:for="{{task.tags}}" wx:key="name" class="tag">
+          <text class="tag-dot" style="background: {{item.color}}"></text>{{item.name}}
+        </view>
+      </view>
+    </view>
+    <view wx:if="{{!task.completedAt}}" class="quick-actions">
+      <view data-id="{{task.id}}" bindtap="postponeTomorrow">明天</view>
+      <view data-id="{{task.id}}" bindtap="togglePinTask">置顶</view>
+      <view data-id="{{task.id}}" bindtap="moveTaskUp">上移</view>
+      <view data-id="{{task.id}}" bindtap="moveTaskDown">下移</view>
+    </view>
+  </view>
+</template>
+
+<view class="page safe-bottom">
+  <view class="header">
+    <view class="title">MiniDo</view>
+    <view class="header-actions">
+      <view wx:if="{{activeTab === 'all'}}" class="weekly-link" bindtap="openWeekly">周报</view>
+      <view class="weekly-link" bindtap="openMine">我的</view>
+    </view>
+  </view>
+
+  <view class="tabs">
+    <view class="tab {{activeTab === 'today' ? 'active' : ''}}" data-tab="today" bindtap="switchTab">今天</view>
+    <view class="tab {{activeTab === 'all' ? 'active' : ''}}" data-tab="all" bindtap="switchTab">全部</view>
+  </view>
+
+  <view wx:if="{{activeTab === 'all'}}" class="tag-filter">
+    <view class="chip {{selectedTag === '' ? 'selected' : ''}}" data-tag="" bindtap="setTagFilter">全部</view>
+    <view wx:for="{{recentTags}}" wx:key="name" class="chip {{selectedTag === item.name ? 'selected' : ''}}" data-tag="{{item.name}}" bindtap="setTagFilter">
+      <text class="tag-dot" style="background: {{item.color}}"></text>{{item.name}}
+    </view>
+  </view>
+
+  <view class="list">
+    <block wx:if="{{activeTab === 'today'}}">
+      <template wx:for="{{todayActive}}" wx:key="id" is="taskCard" data="{{task: item}}"></template>
+      <view wx:if="{{todayOverdue.length}}" class="fold overdue-fold" bindtap="toggleOverdue">{{todayOverdue.length}} 条已逾期</view>
+      <block wx:if="{{overdueExpanded}}">
+        <template wx:for="{{todayOverdue}}" wx:key="id" is="taskCard" data="{{task: item}}"></template>
+      </block>
+      <view wx:if="{{todayCompleted.length}}" class="fold" bindtap="toggleCompleted">已完成 {{todayCompleted.length}} 项</view>
+      <block wx:if="{{completedExpanded}}">
+        <template wx:for="{{todayCompleted}}" wx:key="id" is="taskCard" data="{{task: item}}"></template>
+      </block>
+      <view wx:if="{{!todayActive.length && !todayOverdue.length}}" class="empty">
+        <view class="empty-art">☀️</view>
+        <view>今天没有待办，享受空闲吧</view>
+      </view>
+    </block>
+
+    <block wx:if="{{activeTab === 'all'}}">
+      <template wx:for="{{allActive}}" wx:key="id" is="taskCard" data="{{task: item}}"></template>
+      <view wx:if="{{allStaleOverdue.length}}" class="fold overdue-fold" bindtap="toggleOlder">超过 7 天逾期 {{allStaleOverdue.length}} 项</view>
+      <block wx:if="{{olderExpanded}}">
+        <template wx:for="{{allStaleOverdue}}" wx:key="id" is="taskCard" data="{{task: item}}"></template>
+      </block>
+      <view wx:if="{{allCompleted.length}}" class="fold" bindtap="toggleCompleted">已完成 {{allCompleted.length}} 项</view>
+      <block wx:if="{{completedExpanded}}">
+        <template wx:for="{{allCompleted}}" wx:key="id" is="taskCard" data="{{task: item}}"></template>
+      </block>
+      <view wx:if="{{!allActive.length && !allStaleOverdue.length && !selectedTag}}" class="empty">
+        <view class="empty-art">✨</view>
+        <view>还没有任何任务，点击下方添加第一条</view>
+      </view>
+      <view wx:if="{{!allActive.length && !allStaleOverdue.length && selectedTag}}" class="empty">没有找到匹配的任务</view>
+    </block>
+  </view>
+
+  <view class="composer">
+    <view class="quick-row">
+      <input class="quick-input" value="{{quickTitle}}" placeholder="写下一个待办" bindinput="onQuickTitleInput" confirm-type="done" bindconfirm="addTask" />
+      <button class="icon-button" bindtap="toggleAdvanced">{{showAdvanced ? '收起' : '展开'}}</button>
+      <button class="add-button" bindtap="addTask">添加</button>
+    </view>
+    <view wx:if="{{showAdvanced}}" class="advanced">
+      <textarea class="detail-input" value="{{detail}}" data-field="detail" placeholder="详情，可写一点背景" bindinput="onInput"></textarea>
+      <view class="image-row">
+        <view wx:for="{{advancedImages}}" wx:key="*this" class="image-thumb" data-index="{{index}}" bindtap="removeImage">图</view>
+        <view wx:if="{{advancedImages.length < 3}}" class="image-add" bindtap="chooseImages">+</view>
+      </view>
+      <view class="field-row">
+        <text>截止</text>
+        <picker mode="date" data-field="dueDate" bindchange="onInput">
+          <view class="picker-value">{{dueDate || '不设置'}}</view>
+        </picker>
+      </view>
+      <view class="field-row">
+        <text>提醒</text>
+        <picker mode="date" data-field="reminderDate" bindchange="onInput">
+          <view class="picker-value">{{reminderDate || '日期'}}</view>
+        </picker>
+        <picker mode="time" data-field="reminderTime" bindchange="onInput">
+          <view class="picker-value">{{reminderTime || '时间'}}</view>
+        </picker>
+      </view>
+      <input class="tag-input" value="{{tagsText}}" data-field="tagsText" placeholder="标签，空格分隔，最多 3 个" bindinput="onInput" />
+      <view class="recent-tags">
+        <view wx:for="{{recentTags}}" wx:key="name" class="chip" data-tag="{{item.name}}" bindtap="selectRecentTag">
+          <text class="tag-dot" style="background: {{item.color}}"></text>{{item.name}}
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

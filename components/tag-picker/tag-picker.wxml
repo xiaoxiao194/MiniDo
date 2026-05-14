@@ -1,0 +1,8 @@
+<view class="tag-picker">
+  <view wx:for="{{tags}}" wx:key="name" wx:for-item="tag" wx:for-index="tagIndex" class="tag-row">
+    <view><text class="tag-dot" style="background: {{tag.color}}"></text>{{tag.name}}</view>
+    <view class="colors">
+      <view wx:for="{{colors}}" wx:key="color" wx:for-item="option" class="color-dot" style="background: {{option.color}}" data-index="{{tagIndex}}" data-color="{{option.color}}" bindtap="chooseColor"></view>
+    </view>
+  </view>
+</view>

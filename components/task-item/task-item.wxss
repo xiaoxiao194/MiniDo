@@ -1,0 +1,44 @@
+.task-item {
+  display: flex;
+  gap: 16rpx;
+  padding: 20rpx;
+  border-radius: 8rpx;
+  background: #ffffff;
+}
+
+.check {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  border: 2rpx solid #9ca3af;
+}
+
+.check.done {
+  background: #4A90D9;
+  border-color: #4A90D9;
+}
+
+.body {
+  flex: 1;
+}
+
+.title {
+  font-weight: 650;
+}
+
+.done-title {
+  color: #9ca3af;
+  text-decoration: line-through;
+}
+
+.meta,
+.actions {
+  color: #6b7280;
+  font-size: 24rpx;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}

@@ -1,0 +1,11 @@
+.date-picker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 72rpx;
+  color: #374151;
+}
+
+.date-picker picker {
+  color: #4A90D9;
+}

@@ -1,0 +1,13 @@
+.empty-state {
+  min-height: 220rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+}
+
+.icon {
+  font-size: 64rpx;
+  margin-bottom: 12rpx;
+}

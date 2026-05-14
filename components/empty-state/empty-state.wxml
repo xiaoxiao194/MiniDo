@@ -1,0 +1,4 @@
+<view class="empty-state">
+  <view wx:if="{{icon}}" class="icon">{{icon}}</view>
+  <view>{{text}}</view>
+</view>

@@ -1,0 +1,26 @@
+.tag-row {
+  margin-bottom: 16rpx;
+}
+
+.tag-dot,
+.color-dot {
+  display: inline-block;
+  border-radius: 50%;
+}
+
+.tag-dot {
+  width: 14rpx;
+  height: 14rpx;
+  margin-right: 8rpx;
+}
+
+.colors {
+  display: flex;
+  gap: 12rpx;
+  margin-top: 10rpx;
+}
+
+.color-dot {
+  width: 34rpx;
+  height: 34rpx;
+}
