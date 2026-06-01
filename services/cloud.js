@@ -43,8 +43,19 @@ async function pullTasks(openid) {
   }
   try {
     const db = wx.cloud.database();
-    const result = await db.collection('tasks').where({ openid }).get();
-    const merged = storage.mergeRemoteTasks(result.data || []);
+    const batch = 100;
+    let skip = 0;
+    let all = [];
+    while (true) {
+      const result = await db.collection('tasks').where({ openid }).skip(skip).limit(batch).get();
+      const data = result.data || [];
+      all = all.concat(data);
+      if (data.length < batch) {
+        break;
+      }
+      skip += batch;
+    }
+    const merged = storage.mergeRemoteTasks(all);
     await uploadTasks(merged.toUpload.map((task) => ({ ...task, openid })));
     return merged.merged;
   } catch (error) {
@@ -59,10 +70,36 @@ async function syncAll() {
   }
   try {
     const tasks = await pullTasks(openid);
-    return { ok: true, tasks };
+    try {
+      await cleanupDeletedTasks();
+    } catch (cleanupError) {
+      // 清理失败不影响同步结果
+    }
+    return { ok: true, tasks: storage.getTasks() };
   } catch (error) {
     return { ok: false, reason: error.message || 'sync_failed', tasks: storage.getTasks() };
   }
+}
+
+async function cleanupDeletedTasks(now = new Date()) {
+  const cutoff = now.getTime() - 30 * 86400000;
+  const tasks = storage.getTasks();
+  const stale = tasks.filter((task) => task.deletedAt && new Date(task.deletedAt).getTime() < cutoff);
+  if (!stale.length) {
+    return;
+  }
+  if (wx.cloud) {
+    const db = wx.cloud.database();
+    for (const task of stale) {
+      try {
+        await db.collection('tasks').doc(task.id).remove();
+      } catch (error) {
+        // 单个删除失败不中断整体清理
+      }
+    }
+  }
+  const staleIds = new Set(stale.map((task) => task.id));
+  storage.saveTasks(tasks.filter((task) => !staleIds.has(task.id)));
 }
 
 async function uploadTasks(tasks) {
@@ -80,5 +117,6 @@ module.exports = {
   getOpenId,
   syncTask,
   pullTasks,
-  syncAll
+  syncAll,
+  cleanupDeletedTasks
 };

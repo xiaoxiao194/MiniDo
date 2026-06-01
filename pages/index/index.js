@@ -7,6 +7,7 @@ const {
   postponeTaskByDays,
   pinTask,
   updateTaskSortOrder,
+  getDateKey,
   TAG_COLORS
 } = require('../../utils/taskCore');
 const storage = require('../../services/storage');
@@ -211,7 +212,7 @@ Page({
       nextTask = storage.updateTask(task.id, { reminderStatus: 'local_only' }) || task;
     }
     if (task.localImages && task.localImages.length) {
-      nextTask = await uploadPendingImages(nextTask);
+      nextTask = await imageService.uploadPendingImages(nextTask);
     }
     await cloud.syncTask(nextTask);
     this.loadTasks();
@@ -259,22 +260,25 @@ Page({
     });
   },
 
-  togglePinTask(id) {
+  togglePinTask(eventOrId) {
+    const id = typeof eventOrId === 'string' ? eventOrId : eventOrId.currentTarget.dataset.id;
     const task = this.findTask(id);
     if (!task) return;
     this.persistTask(pinTask(task, !task.isPinned, new Date()));
   },
 
-  postponeTomorrow(id) {
+  postponeTomorrow(eventOrId) {
+    const id = typeof eventOrId === 'string' ? eventOrId : eventOrId.currentTarget.dataset.id;
     const task = this.findTask(id);
     if (!task) return;
     this.persistTask(postponeTaskByDays(task, 1, new Date()));
   },
 
-  moveToToday(id) {
+  moveToToday(eventOrId) {
+    const id = typeof eventOrId === 'string' ? eventOrId : eventOrId.currentTarget.dataset.id;
     const task = this.findTask(id);
     if (!task) return;
-    const today = formatDateKey(new Date());
+    const today = getDateKey(new Date());
     this.persistTask({
       ...task,
       dueDate: today,
@@ -283,10 +287,11 @@ Page({
     });
   },
 
-  moveToTomorrow(id) {
+  moveToTomorrow(eventOrId) {
+    const id = typeof eventOrId === 'string' ? eventOrId : eventOrId.currentTarget.dataset.id;
     const task = this.findTask(id);
     if (!task) return;
-    const tomorrow = formatDateKey(new Date(Date.now() + 86400000));
+    const tomorrow = getDateKey(new Date(Date.now() + 86400000));
     this.persistTask({
       ...task,
       dueDate: tomorrow,
@@ -295,7 +300,8 @@ Page({
     });
   },
 
-  completeTask(id) {
+  completeTask(eventOrId) {
+    const id = typeof eventOrId === 'string' ? eventOrId : eventOrId.currentTarget.dataset.id;
     const task = this.findTask(id);
     if (!task) return;
     this.persistTask({
@@ -365,34 +371,14 @@ Page({
   }
 });
 
-async function uploadPendingImages(task) {
-  const localImages = (task.localImages || []).slice();
-  const imageFileIds = (task.imageFileIds || []).slice();
-  for (let index = 0; index < localImages.length; index += 1) {
-    if (localImages[index].status === 'uploaded') {
-      continue;
-    }
-    const result = await imageService.uploadImage(task.id, localImages[index].src);
-    if (result.ok) {
-      localImages[index] = { ...localImages[index], status: 'uploaded', fileID: result.fileID };
-      if (!imageFileIds.includes(result.fileID)) {
-        imageFileIds.push(result.fileID);
-      }
-    } else {
-      localImages[index] = { ...localImages[index], status: 'failed' };
-    }
-  }
-  return storage.updateTask(task.id, { localImages, imageFileIds }) || task;
-}
-
 function decorateTask(task) {
   return {
     ...task,
     detailExcerpt: task.detail ? task.detail.slice(0, 32) : '',
     hasImages: (task.imageFileIds && task.imageFileIds.length) || (task.localImages && task.localImages.length),
     tags: normalizeDisplayTags(task.tags),
-    isOverdue: task.dueDate && task.dueDate < formatDateKey(new Date()),
-    isDueToday: task.dueDate === formatDateKey(new Date()),
+    isOverdue: task.dueDate && task.dueDate < getDateKey(new Date()),
+    isDueToday: task.dueDate === getDateKey(new Date()),
     timeText: [task.dueDate ? `截止 ${task.dueDate}` : '', formatReminder(task.reminderAt)].filter(Boolean).join(' · ')
   };
 }
@@ -431,12 +417,4 @@ function normalizeDisplayTags(tags) {
       color: tag.color || TAG_COLORS.blue
     };
   });
-}
-
-function formatDateKey(date) {
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, '0'),
-    String(date.getDate()).padStart(2, '0')
-  ].join('-');
 }

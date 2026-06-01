@@ -88,7 +88,7 @@
     <view wx:if="{{showAdvanced}}" class="advanced">
       <textarea class="detail-input" value="{{detail}}" data-field="detail" placeholder="详情，可写一点背景" bindinput="onInput"></textarea>
       <view class="image-row">
-        <view wx:for="{{advancedImages}}" wx:key="*this" class="image-thumb" data-index="{{index}}" bindtap="removeImage">图</view>
+        <image wx:for="{{advancedImages}}" wx:key="*this" class="image-thumb" src="{{item}}" mode="aspectFill" data-index="{{index}}" bindtap="removeImage"></image>
         <view wx:if="{{advancedImages.length < 3}}" class="image-add" bindtap="chooseImages">+</view>
       </view>
       <view class="field-row">

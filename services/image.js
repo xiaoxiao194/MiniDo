@@ -1,3 +1,5 @@
+const storage = require('./storage');
+
 const MAX_IMAGES = 3;
 const TARGET_IMAGE_SIZE = 200 * 1024;
 
@@ -43,10 +45,36 @@ async function uploadImage(taskId, src) {
   }
 }
 
+async function uploadPendingImages(task) {
+  const localImages = (task.localImages || []).slice();
+  const imageFileIds = (task.imageFileIds || []).slice();
+  const results = await Promise.all(localImages.map((image) => {
+    if (image.status === 'uploaded') {
+      return Promise.resolve({ image });
+    }
+    return uploadImage(task.id, image.src).then((result) => ({ image, result }));
+  }));
+  results.forEach((entry, index) => {
+    if (!entry.result) {
+      return;
+    }
+    if (entry.result.ok) {
+      localImages[index] = { ...localImages[index], status: 'uploaded', fileID: entry.result.fileID };
+      if (!imageFileIds.includes(entry.result.fileID)) {
+        imageFileIds.push(entry.result.fileID);
+      }
+    } else {
+      localImages[index] = { ...localImages[index], status: 'failed' };
+    }
+  });
+  return storage.updateTask(task.id, { localImages, imageFileIds }) || task;
+}
+
 module.exports = {
   MAX_IMAGES,
   TARGET_IMAGE_SIZE,
   chooseImages,
   compressImage,
-  uploadImage
+  uploadImage,
+  uploadPendingImages
 };

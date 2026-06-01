@@ -110,7 +110,12 @@ Page({
       localImages: this.data.localImages,
       imageFileIds: this.data.imageFileIds
     };
-    const errors = validateTaskInput(patch, new Date());
+    const toValidate = { ...patch };
+    const reminderUnchanged = this.data.task && reminderAt === this.data.task.reminderAt;
+    if (reminderUnchanged) {
+      delete toValidate.reminderAt;
+    }
+    const errors = validateTaskInput(toValidate, new Date());
     if (errors.length) {
       wx.showToast({ title: errors[0], icon: 'none' });
       return;
@@ -140,7 +145,7 @@ Page({
       nextTask = storage.updateTask(task.id, { reminderStatus: 'local_only' }) || task;
     }
     if (nextTask.localImages && nextTask.localImages.some((image) => image.status !== 'uploaded')) {
-      nextTask = await uploadPendingImages(nextTask);
+      nextTask = await imageService.uploadPendingImages(nextTask);
     }
     await cloud.syncTask(nextTask);
   },
@@ -184,26 +189,6 @@ Page({
     });
   }
 });
-
-async function uploadPendingImages(task) {
-  const localImages = (task.localImages || []).slice();
-  const imageFileIds = (task.imageFileIds || []).slice();
-  for (let index = 0; index < localImages.length; index += 1) {
-    if (localImages[index].status === 'uploaded') {
-      continue;
-    }
-    const result = await imageService.uploadImage(task.id, localImages[index].src);
-    if (result.ok) {
-      localImages[index] = { ...localImages[index], status: 'uploaded', fileID: result.fileID };
-      if (!imageFileIds.includes(result.fileID)) {
-        imageFileIds.push(result.fileID);
-      }
-    } else {
-      localImages[index] = { ...localImages[index], status: 'failed' };
-    }
-  }
-  return storage.updateTask(task.id, { localImages, imageFileIds }) || task;
-}
 
 function splitReminder(value) {
   if (!value) {

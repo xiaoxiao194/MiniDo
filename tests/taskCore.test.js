@@ -125,7 +125,7 @@ test('getAllView sorts incomplete due tasks first, supports tag filtering, and f
     baseTask({ id: 'study', title: '学习', dueDate: '2026-05-06', tags: [{ name: '学习', color: TAG_COLORS.green }] })
   ];
 
-  const view = getAllView(tasks, { tag: '工作' });
+  const view = getAllView(tasks, { tag: '工作', now: NOW });
 
   assert.deepEqual(view.active.map((task) => task.id), ['soon', 'later']);
   assert.deepEqual(view.completed.map((task) => task.id), ['done']);
